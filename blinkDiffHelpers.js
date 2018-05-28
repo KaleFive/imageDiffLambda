@@ -5,10 +5,27 @@ function run(page) {
   let diff = new blinkDiff({
     imageAPath: "/tmp/master_" + page,
     imageBPath: "/tmp/qa_" + page,
+    imageOutputPath: "/tmp/diff_" + page
+  })
 
-    // thresholdType: blinkDiff.THRESHOLD_PERCENT,
-    // threshold: 0.01, // 1% threshold
+  return new Promise(function(resolve, reject) {
+    console.log("running blink-diff")
+    diff.run(function (error, result) {
+      if (error) {
+        reject("Error inside of blinkDiff promise " + error)
+      } else {
+        console.log(diff.hasPassed(result.code) ? "Passed" : "Failed")
+        console.log("Found " + result.differences + " differences.")
+        resolve()
+      }
+    });
+  });
+};
 
+function runBufferInput(arrayOfBuffers, page) {
+  let diff = new blinkDiff({
+    imageA: arrayOfBuffers[0],
+    imageB: arrayOfBuffers[1],
     imageOutputPath: "/tmp/diff_" + page
   })
 
@@ -27,5 +44,6 @@ function run(page) {
 };
 
 module.exports = {
-  "run": run
+  run,
+  runBufferInput
 }

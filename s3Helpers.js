@@ -2,29 +2,31 @@ const AWS = require("aws-sdk")
 const s3 = new AWS.S3()
 const fs = require("fs")
 
-// function pullMasterS3Image(bucket, paramKey) {
-//   let key = "master/" + paramKey
-//   params = { Bucket: bucket, Key: key }
-//   return new Promise(function(resolve, reject) {
-//     s3.getObject(params, function(error, data) {
-//       if(error) { reject() }
-//       let master_buffer = data.Body;
-//       resolve(master_buffer)
-//     })
-//   });
-// }
-//
-// function pullNewBranchS3Image(bucket, paramKey) {
-//   let key = "qa/" + paramKey
-//   params = { Bucket: bucket, Key: key }
-//   return new Promise(function(resolve, reject) {
-//     s3.getObject(params, function(error, data) {
-//       if(error) { reject() }
-//       let qa_buffer = data.Body;
-//       resolve(qa_buffer)
-//     })
-//   });
-// }
+// pull Master png and output as buffer
+function pullMasterS3Image(bucket, paramKey) {
+  let key = "master/" + paramKey
+  params = { Bucket: bucket, Key: key }
+  return new Promise(function(resolve, reject) {
+    s3.getObject(params, function(error, data) {
+      if(error) { reject() }
+      let master_buffer = data.Body;
+      resolve(master_buffer)
+    })
+  });
+}
+
+// pull New png and output as buffer
+function pullNewBranchS3Image(bucket, paramKey) {
+  let key = "qa/" + paramKey
+  params = { Bucket: bucket, Key: key }
+  return new Promise(function(resolve, reject) {
+    s3.getObject(params, function(error, data) {
+      if(error) { reject() }
+      let qa_buffer = data.Body;
+      resolve(qa_buffer)
+    })
+  });
+}
 
 function uploadDiffToS3(bucket, paramKey) {
   let key = "diff_" + paramKey
@@ -53,13 +55,15 @@ function uploadDiffToS3(bucket, paramKey) {
 }
 
 module.exports = {
-  "pullMasterS3Image": pullMasterS3Image,
-  "pullNewBranchS3Image": pullNewBranchS3Image,
-  "uploadDiffToS3": uploadDiffToS3
+  pullMasterS3Image,
+  pullNewBranchS3Image,
+  pullMasterS3Streams,
+  pullNewBranchS3Streams,
+  uploadDiffToS3
 }
 
 // pull Master png with streams
-function pullMasterS3Image(bucket, paramKey) {
+function pullMasterS3Streams(bucket, paramKey) {
   let key = "master_" + paramKey
   params = { Bucket: bucket, Key: "master/" + paramKey }
   let image = fs.createWriteStream("/tmp/" + key)
@@ -77,7 +81,7 @@ function pullMasterS3Image(bucket, paramKey) {
 }
 
 // pull New Branch png with streams
-function pullNewBranchS3Image(bucket, paramKey) {
+function pullNewBranchS3Streams(bucket, paramKey) {
   let key = "qa_" + paramKey
   params = { Bucket: bucket, Key: "qa/" + paramKey }
   let image = fs.createWriteStream("/tmp/" + key)
