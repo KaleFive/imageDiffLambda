@@ -4,7 +4,7 @@ const blinkDiff = require("blink-diff")
 function run(page) {
   let diff = new blinkDiff({
     imageAPath: "/tmp/master_" + page,
-    imageBPath: "/tmp/qa_" + page,
+    imageBPath: "/tmp/branches_" + page,
     imageOutputPath: "/tmp/diff_" + page
   })
 

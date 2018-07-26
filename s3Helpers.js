@@ -4,7 +4,8 @@ const fs = require("fs")
 
 // pull Master png and output as buffer
 function pullMasterS3Image(bucket, paramKey) {
-  let key = "master/" + paramKey
+  // paramKey here is prefixed with 'branches/[branchname]/' so we are taking that out here
+  let key = "master/" + paramKey.split("/").slice(2).join("/");
   params = { Bucket: bucket, Key: key }
   return new Promise(function(resolve, reject) {
     s3.getObject(params, function(error, data) {
@@ -16,21 +17,19 @@ function pullMasterS3Image(bucket, paramKey) {
 }
 
 // pull New png and output as buffer
-function pullNewBranchS3Image(bucket, paramKey) {
-  let key = "qa/" + paramKey
+function pullNewBranchS3Image(bucket, key) {
   params = { Bucket: bucket, Key: key }
   return new Promise(function(resolve, reject) {
     s3.getObject(params, function(error, data) {
       if(error) { reject() }
-      let qa_buffer = data.Body;
-      resolve(qa_buffer)
+      let branch_buffer = data.Body;
+      resolve(branch_buffer)
     })
   });
 }
 
 function uploadDiffToS3(bucket, paramKey) {
-  let key = "diff_" + paramKey
-  let diffPath = "/tmp/" + key
+  let diffPath = "/tmp/diff_" + paramKey
   console.log("diffpath " + diffPath)
   return new Promise(function(resolve, reject) {
     fs.readFile(diffPath, function (err,data) {
@@ -40,7 +39,7 @@ function uploadDiffToS3(bucket, paramKey) {
       let imageStream = fs.createReadStream(diffPath)
       let params = {
         Bucket: bucket,
-        Key: "diff/" + paramKey,
+        Key: "diff/" + paramKey.split("_").slice(1).join("/"),
         Body: imageStream,
         ACL: 'public-read'
       };
@@ -82,8 +81,8 @@ function pullMasterS3Streams(bucket, paramKey) {
 
 // pull New Branch png with streams
 function pullNewBranchS3Streams(bucket, paramKey) {
-  let key = "qa_" + paramKey
-  params = { Bucket: bucket, Key: "qa/" + paramKey }
+  let key = "branches_" + paramKey
+  params = { Bucket: bucket, Key: "branches/" + paramKey }
   let image = fs.createWriteStream("/tmp/" + key)
   return new Promise(function(resolve, reject) {
     let stream = s3.getObject(params).createReadStream()
