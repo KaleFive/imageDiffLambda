@@ -23,6 +23,7 @@ function run(page) {
 };
 
 function runBufferInput(arrayOfBuffers, page) {
+  console.log(arrayOfBuffers)
   let diff = new blinkDiff({
     imageA: arrayOfBuffers[0],
     imageB: arrayOfBuffers[1],
