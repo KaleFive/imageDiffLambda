@@ -33,6 +33,7 @@ function pullNewBranchS3Image(bucket, key) {
 function uploadDiffToS3(bucket, paramKey) {
   let diffPath = "/tmp/diff_" + paramKey
   console.log("diffpath " + diffPath)
+  let uploadDiffPath = "diff/" + paramKey.split("_").slice(1).join("/")
   return new Promise(function(resolve, reject) {
     fs.readFile(diffPath, function (err,data) {
       if (err) {
@@ -41,11 +42,12 @@ function uploadDiffToS3(bucket, paramKey) {
       let imageStream = fs.createReadStream(diffPath)
       let params = {
         Bucket: bucket,
-        Key: "diff/" + paramKey.split("_").slice(1).join("/"),
+        Key: uploadDiffPath,
         Body: imageStream,
         ACL: 'public-read'
       };
       console.log("uploading to S3")
+      console.log(uploadDiffPath)
       s3.putObject(params, function(data) {
         console.log(data)
         console.log("right before resolve")
