@@ -6,6 +6,7 @@ const fs = require("fs")
 function pullMasterS3Image(bucket, paramKey) {
   // paramKey here is prefixed with 'branches/[branchname]/' so we are taking that out here
   let key = "master/" + paramKey.split("/").slice(2).join("/");
+  console.log("this is the master key " + key)
   params = { Bucket: bucket, Key: key }
   return new Promise(function(resolve, reject) {
     s3.getObject(params, function(error, data) {
@@ -18,6 +19,7 @@ function pullMasterS3Image(bucket, paramKey) {
 
 // pull New png and output as buffer
 function pullNewBranchS3Image(bucket, key) {
+  console.log("this is the branch key " + key)
   params = { Bucket: bucket, Key: key }
   return new Promise(function(resolve, reject) {
     s3.getObject(params, function(error, data) {
